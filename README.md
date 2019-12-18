@@ -31,3 +31,13 @@ Test files are under ./spec, run tests with
 ```
 npm run test
 ```
+
+### API Routes
+
+Create - '/api/photo-carousel/$locationId/$photoId'
+
+Read - '/api/photo-carousel/$locationId/$photoId'
+
+Update - '/api/photo-carousel/$locationId/$photoId'
+
+Delete - '/api/photo-carousel/$locationId/$photoId'
