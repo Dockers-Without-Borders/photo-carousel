@@ -36,7 +36,7 @@ npm run test
 
 Create - '/api/photo-carousel/$locationId/$photoId'
 
-Read - '/api/photo-carousel/$locationId/$photoId'
+Read - '/api/photo-carousel/$locationId'
 
 Update - '/api/photo-carousel/$locationId/$photoId'
 
