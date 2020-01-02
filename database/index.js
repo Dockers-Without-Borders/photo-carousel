@@ -1,4 +1,4 @@
-var mysql = require('mysql');
+var { Pool } = require('pg');
 
 const options = {
   user: 'user',
