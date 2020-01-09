@@ -5,9 +5,9 @@ client/dist/
 npm
 npm-debug.log
 node_modules/
-images.csv
-restaurants.csv
-users.csv
+imageData.csv
+restaurantData.csv
+userData.csv
 
 # Dependency Files
 node_modules/
