@@ -4,9 +4,9 @@ const createCSVwriter = require('csv-writer').createObjectCsvWriter;
 const path = require('path');
 
 const pool = new Pool({
-  user: 'postgres',
+  user: 'alextian',
   database: 'photocarousel',
-  port: 3001
+  port: 5432
 });
 
 let seedHelper = {
@@ -19,19 +19,19 @@ let seedHelper = {
   }
 }
 
-const USER_COUNT = 10000;
-const RESTAURANT_COUNT = 10000;
-const IMG_SAMPLE_COUNT = 10000;
+const USER_COUNT = 1000000;
+const RESTAURANT_COUNT = 1000000;
+const IMG_SAMPLE_COUNT = 1000000;
 
 const userWriter = (data) => {
   let writer = createCSVwriter({
     path: `${path.resolve(__dirname, 'csv/userData.csv')}`,
     header: [
-      {id: 'name', title: 'name'},
+      {id: 'user_name', title: 'user_name'},
       {id: 'avatar_url', title: 'avatar_url'},
-      {id: 'friendCount', title: 'friendCount'},
-      {id: 'starCount', title: 'starCount'},
-      {id: 'eliteYear', title: 'eliteYear'}
+      {id: 'friendcount', title: 'friendount'},
+      {id: 'starcount', title: 'starcount'},
+      {id: 'eliteyear', title: 'eliteyear'}
     ]
   });
   return writer.writeRecords(data);
@@ -42,7 +42,7 @@ const restaurantWriter = (data) => {
     path: `${path.resolve(__dirname, 'csv/restaurantData.csv')}`,
     header: [
       {id: 'name', title: 'name'},
-      {id: 'owner', title: 'owner'}
+      {id: 'owner_id', title: 'owner_id'}
     ]
   });
   return writer.writeRecords(data);
@@ -53,13 +53,11 @@ const imageWriter = (data) => {
     path: `${path.resolve(__dirname, 'csv/imageData.csv')}`,
     header: [
       {id: 'image_url', title: 'image_url'},
-      {id: 'title', title: 'title'},
-      {id: 'restaurant', title: 'restaurant'},
-      {id: 'createdAt', title: 'createdAt'},
-      {id: 'user', title: 'user'},
-      {id: 'caption', title: 'caption'},
       {id: 'upvotes', title: 'upvotes'},
-      {id: 'downvotes', title: 'downvotes'}
+      {id: 'downvotes', title: 'downvotes'},
+      {id: 'user_id', title: 'user_id'},
+      {id: 'caption', title: 'caption'},
+      {id: 'restaurant_id', title: 'restaurant_id'}
     ]
   });
   return writer.writeRecords(data);
@@ -85,7 +83,7 @@ let csvSeed = {
     const userData = [];
     for (var i = 0; i < USER_COUNT; i++) {
       let user = {
-        name: faker.name.firstName() + ' ' + faker.name.lastName(),
+        user_name: faker.name.firstName() + ' ' + faker.name.lastName(),
         avatar_url: faker.internet.avatar(),
         friendCount: Math.floor(Math.random() * 50),
         starCount: Math.floor(Math.random() * 100),
@@ -98,10 +96,11 @@ let csvSeed = {
 
   seedRestaurantsCSV: async function() {
     const restaurantData = []
+    const counter = 0;
     for (var i = 0; i < RESTAURANT_COUNT; i++) {
       let restaurant = {
         name : faker.address.streetName(),
-        owner : Math.floor(Math.random() * 100 + 1)
+        owner_id : Math.ceil(Math.random() * USER_COUNT)
       }
       restaurantData.push(restaurant)
     }
@@ -113,15 +112,18 @@ let csvSeed = {
     for (var i = 0; i < IMG_SAMPLE_COUNT; i++) {
       let image = {
         image_url: faker.image.imageUrl(),
-        title: faker.commerce.productName(),
-        createdAt: faker.date.recent(),
-        
+        upvotes: Math.ceil(Math.random() * 10),
+        downvotes: Math.ceil(Math.random() * 7),
+        user_id: Math.ceil(Math.random() * USER_COUNT),
+        caption: faker.commerce.productName(),
+        restaurant_id: Math.ceil(Math.random() * RESTAURANT_COUNT)
       }
       imageData.push(image)
     }
     imageWriter(imageData);
   }
 }
+
 
 csvSeed.seedUsersCSV()
 .then(() => {
@@ -134,9 +136,32 @@ csvSeed.seedUsersCSV()
 })
 .then(() => {
   console.log('images seeded');
-  
+  console.log('importing CSV into database');
+  let queryPromises = [];
+  for (var i = 0; i < 10; i++) {
+    queryPromises.push(csvSeed.query(`\COPY users(user_name,avatar_url,friendCount,starCount,eliteYear) FROM '${path.resolve(__dirname, 'csv/userData.csv')}' DELIMITER ',' CSV HEADER;`, `Users seeded ${i+1}million))`))
+  }
+  return Promise.all(queryPromises);
 })
-
+.then(() => {
+  console.log(`finished importing users`);
+  let queryPromises = [];
+  for (var i = 0; i < 10; i++) {
+    queryPromises.push(csvSeed.query(`\COPY restaurants(name, owner_id) FROM '${path.resolve(__dirname, 'csv/restaurantData.csv')}' DELIMITER ',' CSV HEADER;`, `Restaurants seeded ${i+1}million))`))
+  }
+  return Promise.all(queryPromises);
+})
+.then(() => {
+  console.log('restaurants copied');
+  let queryPromises = [];
+  for (var i = 0; i < 100; i++) {
+    queryPromises.push(csvSeed.query(`\COPY images(image_url, upvotes, downvotes, user_id, caption, restaurant_id) FROM '${path.resolve(__dirname, 'csv/imageData.csv')}' DELIMITER ',' CSV HEADER;`, `Images seeded ${i+1}million))`))
+  }
+  return Promise.all(queryPromises);
+})
+.catch((err) => {
+  console.log(`failed at ${err}`);
+})
 
 
 // const aws_url = 'https://yelp-overview-gallery.s3-us-west-1.amazonaws.com/images/'

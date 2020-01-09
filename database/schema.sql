@@ -1,16 +1,17 @@
 DROP DATABASE IF EXISTS photocarousel;
 CREATE DATABASE photocarousel;
 
+\c photocarousel;
+
 USE photocarousel;
 
 CREATE TABLE users (
-  id INT AUTO_INCREMENT NOT NULL,
-  name VARCHAR(255) NOT NULL,
-  avatar_url VARCHAR(255),
-  friendCount INT DEFAULT 0, 
-  starCount INT DEFAULT 0,
-  eliteYear date DEFAULT NULL, 
-  PRIMARY KEY (id)
+  id SERIAL PRIMARY KEY,
+  name varchar(255) not null,
+  avatar_url varchar(255),
+  friendCount smallint DEFAULT 0, 
+  starCount smallint DEFAULT 0,
+  eliteYear smallint DEFAULT NULL
 );
 
 -- CREATE TABLE friends (
@@ -21,11 +22,9 @@ CREATE TABLE users (
 -- )
 
 CREATE TABLE restaurants (
-  id INT AUTO_INCREMENT NOT NULL,
-  name VARCHAR(255) NOT NULL,
-  owner INT,
-  PRIMARY KEY (id),
-  FOREIGN KEY (owner) REFERENCES users(id)
+  id SERIAL PRIMARY KEY,
+  name varchar(255) not null,
+  owner int
 );
 
 -- CREATE TABLE votes (
@@ -37,19 +36,19 @@ CREATE TABLE restaurants (
 -- )
 
 CREATE TABLE images (
-  id INT AUTO_INCREMENT NOT NULL,
-  img_url VARCHAR(255) NOT NULL,
-  title VARCHAR(255),
-  createdAt TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-  restaurant INT,
-  user INT,
-  caption VARCHAR(255),
-  upvotes INT, 
-  downvotes INT, 
-  PRIMARY KEY (id),
+  id SERIAL PRIMARY KEY,
+  img_url varchar(150) not null,
+  title varchar(255),
+  createdAt date not null,
+  user smallint,
+  upvotes smallint, 
+  downvotes smallint, 
+  restaurant_id INT,
   FOREIGN KEY (restaurant) REFERENCES restaurants(id),
   FOREIGN KEY (user) REFERENCES users(id)
 );
+
+CREATE INDEX idx_restaurant_id ON images USING HASH (restaurant_id);
 
 
 

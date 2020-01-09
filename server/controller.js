@@ -2,7 +2,7 @@ var model = require('./model.js');
 
 let controller = {
 
-  sampleQuery: function (locationId) {
+  retrieveImages: function (locationId) {
     return model.sampleQuery(locationId);
   },
 
@@ -10,25 +10,27 @@ let controller = {
     return model.locationQuery(locationId);
   },
 
-  imagesQuery: function (locationId) {
+  imagesQuery: function (restaurant_id) {
     let imagesQueryPromise = new Promise( (resolve, reject) => {
-      model.imagesQuery(locationId)
+      model.imagesQuery(restaurant_id)
       .then( results => {
         let imagesData = [];
-        results.forEach( result => {
+        results.rows.forEach( result => {
           let image = {
             id: result.id,
             img_url: result.img_url,
-            title: result.title,
-            createdAt: result.createdAt,
-            locationId: result.locationId,
+            upvotes: result.upvotes,
+            downvotes: result.downvotes,
+            caption: result.caption,
+            created_at: result.created_at,
+            restaurant_id: result.restaurant_id,
             owner: {
-              id: result.ownerId,
-              name: result.ownerName,
-              avatar_url: result.ownerAvatar_url,
-              friendCount: result.ownerFriendCount,
-              starCount: result.ownerStarCount,
-              eliteYear: result.ownerEliteYear,
+              id: result.user_id,
+              name: result.user_name,
+              avatar_url: result.avatar_url,
+              friendCount: result.friendcount,
+              starCount: result.starcount,
+              eliteYear: result.eliteyear
             }
           };
           imagesData.push(image);

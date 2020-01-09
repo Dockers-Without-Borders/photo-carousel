@@ -1,3 +1,4 @@
+require('newrelic');
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
@@ -9,9 +10,9 @@ app.set('port', 3001);
 app.use(cors());
 app.use('/', express.static(path.join(__dirname, '../client/dist')));
 
-app.get('/photo-carousel/:locationId', (req, res) => {
-  let locationId = req.params.locationId;
-  controller.sampleQuery(locationId)
+app.get('/photocarousel/:restaurant_id', (req, res) => {
+  let restaurant_id = req.params.restaurant_id;
+  controller.imagesQuery(restaurant_id)
   .catch( err => {
     res.status(404).send(err);
   })
@@ -20,28 +21,28 @@ app.get('/photo-carousel/:locationId', (req, res) => {
   });
 });
 
-app.get('/photo-carousel/:locationId', (req, res) => {
-  let locationId = req.params.locationId;
-  let data = {};
+// app.get('/photocarousel/:restaurant_id', (req, res) => {
+//   let locationId = req.params.locationId;
+//   let data = {};
 
-  controller.locationQuery(locationId)
-  .catch( err => {
-    res.status(400).send(err);
-  })
-  .then( result => {
-    data['locationData'] = result;
-    return controller.imagesQuery(locationId);
-  })
-  .catch( err => {
-    res.status(404).send(err);
-  })
-  .then( result => {
-    data['images'] = result;
-    res.status(200).send(data);
-  });
-});
+//   controller.locationQuery(locationId)
+//   .catch( err => {
+//     res.status(400).send(err);
+//   })
+//   .then( result => {
+//     data['locationData'] = result;
+//     return controller.imagesQuery(locationId);
+//   })
+//   .catch( err => {
+//     res.status(404).send(err);
+//   })
+//   .then( result => {
+//     data['images'] = result;
+//     res.status(200).send(data);
+//   });
+// });
 
-app.post('/photo-carousel/:locationId', (req, res) => {
+app.post('/photocarousel/:restaurant_id', (req, res) => {
   let locationId = req.params.locationId;
   
   controller.postPhoto(locationId)
@@ -53,7 +54,7 @@ app.post('/photo-carousel/:locationId', (req, res) => {
   })
 })
 
-app.put('/photo-carousel/:locationId/:photoId', (req, res) => {
+app.put('/photocarousel/:restaurant_id/:id', (req, res) => {
   let locationId = req.params.locationId;
   let photoId = req.params.photoId;
 
@@ -66,7 +67,7 @@ app.put('/photo-carousel/:locationId/:photoId', (req, res) => {
   })
 })
 
-app.delete('/photo-carousel/:locationId/:photoId', (req, res) => {
+app.delete('/photo-carousel/:restaurant_id/:id', (req, res) => {
   let locationId = req.params.locationId;
   let photoId = req.params.photoId;
 

@@ -1,12 +1,13 @@
 var { Pool } = require('pg');
 
-const options = {
-  user: 'user',
-  password: 'user',
-  database: 'yelpoverviewgallery'
-};
+let pool = new Pool({
+  host: 'localhost',
+  user: 'alextian',
+  database: 'photocarousel',
+});
 
-const db = mysql.createConnection(options);
-db.connect();
+module.exports = {
+  pool: pool
+}
 
-module.exports = db;
+ // host: '18.144.8.170',

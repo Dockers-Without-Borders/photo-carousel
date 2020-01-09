@@ -1,6 +1,14 @@
 # Compiled Files
 client/dist/
 
+# npm and csv
+npm
+npm-debug.log
+node_modules/
+images.csv
+restaurants.csv
+users.csv
+
 # Dependency Files
 node_modules/
 

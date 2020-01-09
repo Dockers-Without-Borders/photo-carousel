@@ -1,13 +1,13 @@
-var db = require('../database/index.js');
+var { pool } = require('../database/index.js');
 var Promise = require('bluebird');
 
-Promise.promisifyAll(db);
+Promise.promisifyAll(pool);
 
 let model = {
 
-  sampleQuery: function (locationId) {
+  sampleQuery: function (restaurant_id) {
     let sampleQueryPromise = new Promise((resolve, reject) => {
-      db.queryAsync('SELECT * FROM images WHERE locationId = ?', [locationId])
+      pool.queryAsync('SELECT * FROM images WHERE restaurant_id = ? LIMIT 10', [restaurant_id])
       .catch( err => {
         reject(err);
       })
@@ -17,10 +17,12 @@ let model = {
           var obj = {
             'id': results[i].id,
             'img_url': results[i].img_url,
-            'title': results[i].title,
-            'createdAt': results[i].createdAt,
-            'locationId': results[i].locationId, 
-            'ownerId': results[i].ownerId
+            'upvotes': results[i].upvotes,
+            'downvotes': results[i].downvotes,
+            'caption': results[i].caption,
+            'created_at': results[i].created_at,
+            'restaurant_id': results[i].restaurant_id, 
+            'user_id': results[i].user_id
           };
           data.push(obj);
         }
@@ -30,9 +32,9 @@ let model = {
     return sampleQueryPromise;
   },
 
-  locationQuery: function (locationId) {
-    let locationQueryPromise = new Promise((resolve, reject) => {
-      db.queryAsync('SELECT * FROM locations WHERE id = ?', [locationId])
+  locationQuery: function (restaurant_id) {
+    let restaurantQueryPromise = new Promise((resolve, reject) => {
+      pool.queryAsync('SELECT * FROM restaurants WHERE id = ? LIMIT 1', [restaurant_id])
       .catch( err => {
         reject(err);
       })
@@ -41,27 +43,14 @@ let model = {
         resolve(result);
       });
     });
-    return locationQueryPromise;
+    return restaurantQueryPromise;
   },
 
-  imagesQuery: function (locationId) {
+  // SELECT * FROM images INNER JOIN users ON images.user_id = users.id WHERE images.restaurant_id = ? limit 10
+  imagesQuery: function (restaurant_id) {
     let imagesQueryPromise = new Promise((resolve, reject) => {
-      db.queryAsync(`SELECT i.id AS id,
-                            i.img_url AS img_url,
-                            i.title AS title,
-                            i.createdAt AS createdAt,
-                            i.ownerId AS ownerId,
-                            u.name AS ownerName,
-                            u.avatar_url AS ownerAvatar_url,
-                            u.friendCount AS ownerFriendCount,
-                            u.starCount AS ownerStarCount,
-                            u.eliteYear AS ownerEliteYear
-                     FROM images i
-                     INNER JOIN users u
-                     ON i.ownerId = u.id
-                     WHERE i.locationId = ?
-                     ORDER BY u.starCount
-                     LIMIT 20`, locationId)
+      console.log(restaurant_id);
+      pool.queryAsync(`SELECT * FROM images INNER JOIN users ON images.user_id = users.id WHERE images.restaurant_id = ${restaurant_id} LIMIT 10`)
       .catch( err => {
         reject(err);
       })
